@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Home</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <form [formGroup]="timeEntryForm" no-lines>
+    <ion-item id="activity">
+      <ion-label>Activity</ion-label>
+      <ion-select formControlName="activity" >
+        <ion-option *ngFor="let activity of activities" value="{{activity.id}}">{{activity.label}}</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item id="comment">
+      <ion-label>Comment</ion-label>
+      <ion-input formControlName="comment" value="{{timeEntry.comment}}"></ion-input>
+    </ion-item>
+
+    <ion-row>
+      <ion-col>
+        <button ion-button float-start id="start-button" [disabled]="!timeEntryForm.valid" *ngIf="!timeEntry.started && !timeEntry.ended" (click)="startTimeEntry()">Start</button>
+      </ion-col>
+      <ion-col>
+        <button ion-button float-end   id="stop-button"  [disabled]="!timeEntryForm.valid" *ngIf="timeEntry.started && !timeEntry.ended"  (click)="stopTimeEntry()">Stop</button>
+      </ion-col>
+    </ion-row>
+  </form>
+
+  <ion-list>
+    <ion-item *ngFor="let timeEntry of timeEntries; let i = index;" (click)="goToEditNewTimeEntry(timeEntry)">
+      <ion-row>
+        <ion-col col-2>
+          <p *ngIf="timeEntry.ended">{{timeEntry.ended   | datex:'HH:mm':'America/New_York' }}</p>
+          <p                        >{{timeEntry.started | datex:'HH:mm':'America/New_York' }}</p>
+        </ion-col>
+
+        <ion-col col-7 text-left text-wrap>
+          <h2>{{timeEntry.activity.label}}</h2>
+          <p>{{timeEntry.comment}}</p>
+        </ion-col>
+
+        <ion-col col-2 text-right>
+          <p>{{timeDiff(timeEntry.started, timeEntry.ended)}}</p>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+
+    <ion-item *ngIf="timeEntries.length === 0">
+      <p>Nothing to display</p>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

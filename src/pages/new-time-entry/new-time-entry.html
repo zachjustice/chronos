@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>New Time Entry</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <form [formGroup]="timeEntryForm" no-lines (ngSubmit)="submit()">
+
+      <ion-item id="activity">
+        <ion-label>Activity</ion-label>
+        <ion-select formControlName="activity" >
+          <ion-option *ngFor="let activity of activities" value="{{activity.id}}">{{activity.label}}</ion-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item id="comment">
+        <ion-label>Comment</ion-label>
+        <ion-input formControlName="comment"></ion-input>
+      </ion-item>
+
+      <ion-item id="started">
+        <ion-label>Started</ion-label>
+        <ion-datetime displayFormat="YYYY-MM-DD HH:mm" formControlName="started" [ngModel]="started | formatToLocal:'GMT':'America/New_York'" (ngModelChange)="started=$event"></ion-datetime>
+      </ion-item>
+
+      <ion-item id="ended">
+        <ion-label>Ended</ion-label>
+        <ion-datetime displayFormat="YYYY-MM-DD HH:mm" formControlName="ended" [ngModel]="ended | formatToLocal:'GMT':'America/New_York'" (ngModelChange)="ended=$event"></ion-datetime>
+      </ion-item>
+
+    </form>
+
+    <ion-row>
+      <ion-col>
+        <button id="submit-button" ion-button full round large (click)="submit()" [disabled]="!timeEntryForm.valid">{{saveText}}</button>
+      </ion-col>
+
+      <ion-col>
+        <button id="delete-button" ion-button full round large (click)="delete()" color="danger" [disabled]="!timeEntry.id">Delete</button>
+      </ion-col>
+    </ion-row>
+  </ion-list>
+</ion-content>
