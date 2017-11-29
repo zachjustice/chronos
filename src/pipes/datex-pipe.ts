@@ -13,7 +13,6 @@ export class DatexPipe implements PipeTransform {
       format = formatArg;
     }
 
-    console.log("TIMEZONE ARG " + timezoneArg);
     if(timezoneArg) {
       timezone = timezoneArg;
     }

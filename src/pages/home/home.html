@@ -26,11 +26,9 @@
     </ion-item>
 
     <ion-row>
-      <ion-col>
-        <button ion-button float-start id="start-button" [disabled]="!timeEntryForm.valid" *ngIf="!timeEntry.started && !timeEntry.ended" (click)="startTimeEntry()">Start</button>
-      </ion-col>
-      <ion-col>
-        <button ion-button float-end   id="stop-button"  [disabled]="!timeEntryForm.valid" *ngIf="timeEntry.started && !timeEntry.ended"  (click)="stopTimeEntry()">Stop</button>
+      <ion-col id="button-col">
+        <button ion-button round outline class="my-button" color="secondary" [disabled]="!timeEntryForm.valid" *ngIf="!timeEntry.started && !timeEntry.ended" (click)="startTimeEntry()">Start</button>
+        <button ion-button round outline class="my-button"  color="danger"    [disabled]="!timeEntryForm.valid" *ngIf="timeEntry.started && !timeEntry.ended"  (click)="stopTimeEntry()">Stop</button>
       </ion-col>
     </ion-row>
   </form>

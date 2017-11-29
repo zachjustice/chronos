@@ -6,6 +6,8 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivityService} from "../../providers/activity.service";
 import {Activity} from "../../models/activity";
 
+import {Observable} from "rxjs/Observable";
+import {Subject} from "rxjs/Subject";
 import * as moment from 'moment-timezone';
 
 @Component({
@@ -14,6 +16,7 @@ import * as moment from 'moment-timezone';
 })
 export class NewTimeEntryPage {
   public timeEntry: TimeEntry = {};
+  public timeEntries: Array<TimeEntry> = [];
   public timeEntryForm: FormGroup;
   public saveText: string = "Save";
   public activities: Array<Activity>;
@@ -38,6 +41,8 @@ export class NewTimeEntryPage {
         ended: [''],
       });
 
+      this.timeEntries = this.navParams.get('timeEntries');
+
       let timeEntry = this.navParams.get('timeEntry');
       if(timeEntry) {
         this.timeEntry = timeEntry;
@@ -51,6 +56,10 @@ export class NewTimeEntryPage {
   }
 
   ionViewDidLoad() {
+    this.getTimeEntries().subscribe((timeEntries) => {
+      this.setStart(timeEntries);
+    });
+
     this.activityService.get().subscribe((activities) => {
         this.activities = activities;
       },
@@ -65,6 +74,48 @@ export class NewTimeEntryPage {
 
         toast.present(toast);
       })
+  }
+
+  getTimeEntries() {
+    let s = new Subject();
+    this.timeEntryService.get().subscribe((timeEntries) => {
+      this.timeEntries = timeEntries;
+      s.next(this.timeEntries);
+      s.complete();
+    }, error => {
+      const toast = this.toastController.create({
+        //title: 'Error!',
+        message: 'Could not load time entries, so now that "set time" button will not work and we can\'t set the start time to the last entry\'s end time :(',
+        duration: 3000,
+        position: 'bottom'
+      });
+
+      toast.present(toast);
+      Observable.throw(error);
+    });
+
+    return s.asObservable();
+  }
+
+  setStart(timeEntries) {
+    let currIndex = -1;
+    // get the previous time entry
+    if(this.timeEntry.started) {
+      for(let i = 0; i < this.timeEntries.length; i++) {
+        if(this.timeEntry.id == this.timeEntries[0].id) {
+          currIndex == i;
+        }
+      }
+    }
+
+    // set start time to the previous time entry's end time
+    // if there's no previous time entry, use the most recent time entry
+    currIndex += 1;
+    let endTime = timeEntries[currIndex].ended;
+    if(endTime) {
+      let mDate = moment.tz(endTime, 'GMT').tz('America/New_York');
+      this.started = mDate.format();
+    }
   }
 
   submit() {

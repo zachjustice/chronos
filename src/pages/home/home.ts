@@ -38,6 +38,9 @@ export class HomePage {
 
   doRefresh(refresher) {
     this.getTimeEntries().subscribe(() => {
+      if(this.timeEntries.length > 0 && this.timeEntries[0].ended) {
+          this.timeEntry = {}; 
+      }
       refresher.complete()
     });
   }
@@ -103,7 +106,6 @@ export class HomePage {
     this.timeEntry.activity = activity;
     this.timeEntry.started  = moment().tz('GMT').format(this.timestampFormat);
     this.timeEntry.comment  = this.timeEntryForm.controls['comment'].value;
-    console.log("START NEW TIME ENTRY. STARTED " + this.timeEntry.started)
 
     this.timeEntryService.create(this.timeEntry)
       .subscribe((timeEntry: TimeEntry) => {
@@ -152,7 +154,6 @@ export class HomePage {
     this.timeEntry.ended = moment().tz('GMT').format(this.timestampFormat);
     this.timeEntry.comment = this.timeEntryForm.controls['comment'].value;
     this.timeEntry.activity = activity;
-    console.log("STOP NEW TIME ENTRY. ENDED " + this.timeEntry.ended)
 
     this.timeEntryService.update(this.timeEntry)
       .subscribe((timeEntry: TimeEntry) => {
