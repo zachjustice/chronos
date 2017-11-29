@@ -57,7 +57,9 @@ export class NewTimeEntryPage {
 
   ionViewDidLoad() {
     this.getTimeEntries().subscribe((timeEntries) => {
-      this.setStart(timeEntries);
+      if(!this.timeEntry || !this.timeEntry.started) {
+        this.setStart(timeEntries);
+      }
     });
 
     this.activityService.get().subscribe((activities) => {
@@ -102,8 +104,8 @@ export class NewTimeEntryPage {
     // get the previous time entry
     if(this.timeEntry.started) {
       for(let i = 0; i < this.timeEntries.length; i++) {
-        if(this.timeEntry.id == this.timeEntries[0].id) {
-          currIndex == i;
+        if(this.timeEntry.id == this.timeEntries[i].id) {
+          currIndex = i;
         }
       }
     }
