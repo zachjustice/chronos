@@ -206,7 +206,7 @@ export class HomePage {
     }
   }
 
-  goToEditNewTimeEntry(timeEntry: TimeEntry) {
+  goToEditNewTimeEntry(timeEntry: TimeEntry = null) {
     this.navCtrl.push(NewTimeEntryPage, {
       timeEntry: timeEntry
     })
