@@ -6,6 +6,7 @@ import {Observable} from "rxjs/Observable";
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
+import {Page} from "../models/page";
 
 @Injectable()
 export class TimeEntryService {
@@ -33,9 +34,9 @@ export class TimeEntryService {
     }).catch(this.handleError);
   }
 
-  get() {
-    return this.http.get(`${this.url}/time`).map((timeEntries: Array<TimeEntry>) => {
-      return timeEntries;
+  get(page: number): Observable<Page<TimeEntry>> {
+    return this.http.get(`${this.url}/time?page=${page}`).map((timeEntriesPage: Page<TimeEntry>) => {
+      return timeEntriesPage;
     }).catch(this.handleError);
   }
 

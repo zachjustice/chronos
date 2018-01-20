@@ -9,6 +9,7 @@ import {Activity} from "../../models/activity";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import * as moment from 'moment-timezone';
+import {Page} from "../../models/page";
 
 @Component({
   selector: 'page-new-time-entry',
@@ -80,8 +81,8 @@ export class NewTimeEntryPage {
 
   getTimeEntries() {
     let s = new Subject();
-    this.timeEntryService.get().subscribe((timeEntries) => {
-      this.timeEntries = timeEntries;
+    this.timeEntryService.get(0).subscribe((timeEntries: Page<TimeEntry>) => {
+      this.timeEntries = timeEntries.content;
       s.next(this.timeEntries);
       s.complete();
     }, error => {

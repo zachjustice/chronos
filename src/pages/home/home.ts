@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {NavController, ToastController} from 'ionic-angular';
+import {InfiniteScroll, NavController, ToastController} from 'ionic-angular';
 import {TimeEntry} from "../../models/time-entry";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {TimeEntryService} from "../../providers/time-entry.service";
@@ -9,6 +9,7 @@ import { NewTimeEntryPage } from '../new-time-entry/new-time-entry';
 
 import {Subject} from "rxjs/Subject";
 import * as moment from 'moment-timezone';
+import {Page} from "../../models/page";
 
 @Component({
   selector: 'page-home',
@@ -20,6 +21,9 @@ export class HomePage {
   public activities: Array<Activity>;
   public timeEntryForm: FormGroup;
   public timeEntries: Array<TimeEntry> = [];
+  public timeEntriesPage: Page<TimeEntry>;
+
+  private page = 0;
 
   private readonly timestampFormat: string = 'YYYY-MM-DD HH:mm:ss';
 
@@ -37,9 +41,13 @@ export class HomePage {
   }
 
   doRefresh(refresher) {
+    this.page = 0;
+    this.timeEntriesPage = null;
+    this.timeEntries = [];
+
     this.getTimeEntries().subscribe(() => {
       if(this.timeEntries.length > 0 && this.timeEntries[0].ended) {
-          this.timeEntry = {}; 
+          this.timeEntry = {};
       }
       refresher.complete()
     });
@@ -66,8 +74,15 @@ export class HomePage {
 
   getTimeEntries() {
     let subject = new Subject();
-    this.timeEntryService.get().subscribe((timeEntries) => {
-      this.timeEntries = timeEntries;
+
+    if (this.timeEntriesPage && this.timeEntriesPage.last) {
+      return;
+    }
+
+    this.timeEntryService.get(this.page).subscribe((timeEntriesPage) => {
+      timeEntriesPage.content.map((timeEntry: TimeEntry) => {
+        this.timeEntries.push(timeEntry)
+      });
 
       if(this.timeEntries.length > 0 && !this.timeEntries[0].ended) {
         this.timeEntry = this.timeEntries[0];
@@ -194,6 +209,13 @@ export class HomePage {
   goToEditNewTimeEntry(timeEntry: TimeEntry) {
     this.navCtrl.push(NewTimeEntryPage, {
       timeEntry: timeEntry
+    })
+  }
+
+  doInfinite(infinite: InfiniteScroll) {
+    this.page++;
+    this.getTimeEntries().subscribe(() => {
+      infinite.complete();
     })
   }
 }
